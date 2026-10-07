@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  /* Warm, simple "tip jar" palette — never fintech, never crypto. */
+  --fp-bg: #FFF8F1;
+  --fp-surface: #FFFFFF;
+  --fp-surface-alt: #FDF3E6;
+  --fp-border: #E7D9CE;
+  --fp-border-strong: #D4C4B5;
+
+  --fp-text: #2B2118;
+  --fp-text-muted: #6B5E51;
+  --fp-text-subtle: #8A7B6C;
+
+  --fp-accent: #F59E0B;
+  --fp-accent-hover: #D97706;
+  --fp-accent-soft: #FEF3C7;
+  --fp-accent-text: #92400E;
+
+  --fp-success: #16A34A;
+  --fp-success-soft: #DCFCE7;
+  --fp-error: #DC2626;
+  --fp-error-soft: #FEE2E2;
+  --fp-warning: #F59E0B;
+  --fp-warning-soft: #FEF3C7;
+  --fp-info: #2563EB;
+  --fp-info-soft: #DBEAFE;
+
+  --fp-overlay: rgba(43, 33, 24, 0.32);
+  --fp-focus-ring: rgba(245, 158, 11, 0.35);
+}
+
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--fp-bg);
+  color: var(--fp-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Focus ring for keyboard navigation — visible and warm, never color-only. */
+:focus-visible {
+  outline: 3px solid var(--fp-focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Make sure focus rings are never hidden for keyboard users. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Respect reduced motion for vestibular and cognitive users. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
