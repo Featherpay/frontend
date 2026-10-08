@@ -187,24 +187,9 @@ export default function TipPageClient({
             onSubmit={handleSubmit}
             isSubmitting={submitting}
             error={error}
-            successMessage={successMessage || (settlementDelayed ? undefined : null)}
+            successMessage={successMessage}
           />
         </div>
-
-        {successMessage && !settlementDelayed && !submitting ? (
-          <div
-            role="status"
-            aria-live="polite"
-            style={{
-              marginTop: tokens.spacing["2xl"],
-              textAlign: "center",
-              color: tokens.color.success,
-              fontSize: tokens.typography.fontSize.lg,
-            }}
-          >
-            {successMessage}
-          </div>
-        ) : null}
       </div>
     </main>
   );
