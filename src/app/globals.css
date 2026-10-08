@@ -90,3 +90,7 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+@keyframes fp-spin {
+  to { transform: rotate(360deg); }
+}
