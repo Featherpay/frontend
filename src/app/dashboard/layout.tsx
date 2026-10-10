@@ -1,5 +1,3 @@
-"use client";
-
 // Dashboard layout — auth-gated, shared chrome for all dashboard routes.
 import { redirect } from "next/navigation";
 import { apiClient } from "@/lib/api";

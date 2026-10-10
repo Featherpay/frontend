@@ -5,7 +5,7 @@
   "use strict";
 
   // Find the script tag that loaded this script
-  const scriptTag = document.currentScript as HTMLScriptElement;
+  const scriptTag = document.currentScript;
   if (!scriptTag) {
     console.error("Featherpay embed: Could not find script tag");
     return;

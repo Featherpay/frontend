@@ -45,7 +45,7 @@ function HistoryContent({ creatorId }: HistoryPageProps) {
           Tip History
         </h1>
         <p style={{ color: tokens.color.textMuted, marginTop: tokens.spacing.xs }}>
-          All tips you've received. {history.total} total.
+          All tips you&apos;ve received. {history.total} total.
         </p>
       </header>
 

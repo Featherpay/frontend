@@ -1,5 +1,6 @@
 // Dashboard overview — earnings summary and recent tips.
 import { Suspense } from "react";
+import Link from "next/link";
 import { apiClient } from "@/lib/api";
 import { tokens } from "@/styles/tokens";
 import { EarningsChart } from "@/components/EarningsChart";
@@ -23,7 +24,7 @@ async function DashboardContent({ creatorId }: DashboardPageProps) {
           Dashboard
         </h1>
         <p style={{ color: tokens.color.textMuted, marginTop: tokens.spacing.xs }}>
-          Welcome back! Here's your earnings overview.
+          Welcome back! Here&apos;s your earnings overview.
         </p>
       </header>
 
@@ -63,7 +64,7 @@ async function DashboardContent({ creatorId }: DashboardPageProps) {
           <h2 style={{ fontSize: tokens.typography.fontSize.xl, fontWeight: tokens.typography.fontWeight.semibold, margin: 0 }}>
             Recent Tips
           </h2>
-          <a
+          <Link
             href="/dashboard/history"
             style={{
               color: tokens.color.accent,
@@ -73,7 +74,7 @@ async function DashboardContent({ creatorId }: DashboardPageProps) {
             }}
           >
             View all →
-          </a>
+          </Link>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: tokens.spacing.md }}>
           {history.items.length === 0 ? (
