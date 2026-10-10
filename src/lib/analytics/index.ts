@@ -1,13 +1,7 @@
-// Lightweight, pluggable conversion-funnel analytics.
-//
-// This client is a no-op in test environments and never logs raw card data,
-// email addresses, or amounts. The actual analytics backend is configured via
-// `NEXT_PUBLIC_ANALYTICS_PROVIDER` — nothing here is hardcoded.
-//
-// Full event wiring is implemented on Day 7; this file exists so the
-// directory structure is complete and the pluggable contract is defined.
+// Conversion funnel analytics — lightweight, pluggable, no PII.
+import { tokens } from "@/styles/tokens";
 
-export type AnalyticsEvent =
+type EventName =
   | "tip_page_viewed"
   | "amount_selected"
   | "card_entry_started"
@@ -16,56 +10,140 @@ export type AnalyticsEvent =
   | "tip_succeeded"
   | "tip_failed";
 
-export type AmountSelectionType = "quick-select" | "custom";
-
-export type TipFailedErrorType =
-  | "card_declined"
-  | "api_error"
-  | "settlement_delayed";
-
-export interface AnalyticsProperties {
-  creatorHandle?: string;
-  referrer?: "direct" | "social" | "embed";
-  selectionType?: AmountSelectionType;
-  errorType?: TipFailedErrorType;
-  [key: string]: unknown;
+interface TipEvent {
+  name: EventName;
+  properties?: Record<string, string | number | boolean>;
+  timestamp: number;
 }
 
-export interface AnalyticsBackend {
-  track(event: AnalyticsEvent, properties?: AnalyticsProperties): void;
+type AnalyticsBackend = "console" | "posthog" | "mixpanel" | "custom";
+
+interface AnalyticsConfig {
+  backend: AnalyticsBackend;
+  apiKey?: string;
+  host?: string;
+  customSend?: (event: TipEvent) => Promise<void>;
 }
 
-/** No-op backend used in tests and whenever no provider is configured. */
-class NoopBackend implements AnalyticsBackend {
-  track(_event: AnalyticsEvent, _properties?: AnalyticsProperties): void {
-    // Intentionally silent.
+let config: AnalyticsConfig = {
+  backend: "console",
+};
+
+let isTestEnv = false;
+
+export function configureAnalytics(cfg: Partial<AnalyticsConfig>) {
+  config = { ...config, ...cfg };
+}
+
+export function setTestEnv(test: boolean) {
+  isTestEnv = test;
+}
+
+const eventQueue: TipEvent[] = [];
+let isProcessing = false;
+
+async function processQueue() {
+  if (isProcessing || eventQueue.length === 0) return;
+  isProcessing = true;
+
+  while (eventQueue.length > 0) {
+    const event = eventQueue.shift()!;
+    try {
+      await sendEvent(event);
+    } catch (err) {
+      console.error("Analytics send failed:", err);
+      // Re-queue on failure
+      eventQueue.unshift(event);
+      break;
+    }
+  }
+
+  isProcessing = false;
+}
+
+async function sendEvent(event: TipEvent) {
+  if (isTestEnv) return; // No-op in tests
+
+  switch (config.backend) {
+    case "console":
+      console.log("[Analytics]", event.name, event.properties);
+      break;
+    case "posthog":
+      if (config.apiKey && config.host) {
+        await fetch(`${config.host}/capture/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            api_key: config.apiKey,
+            event: event.name,
+            properties: {
+              ...event.properties,
+              $timestamp: new Date(event.timestamp).toISOString(),
+            },
+          }),
+        });
+      }
+      break;
+    case "mixpanel":
+      if (config.apiKey) {
+        await fetch("https://api.mixpanel.com/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event: event.name,
+            properties: {
+              ...event.properties,
+              token: config.apiKey,
+              time: Math.floor(event.timestamp / 1000),
+            },
+          }),
+        });
+      }
+      break;
+    case "custom":
+      if (config.customSend) {
+        await config.customSend(event);
+      }
+      break;
   }
 }
 
-function resolveBackend(): AnalyticsBackend {
-  if (typeof process === "undefined") return new NoopBackend();
-  if (process.env.NODE_ENV === "test") return new NoopBackend();
-  const provider = process.env.NEXT_PUBLIC_ANALYTICS_PROVIDER;
-  if (!provider || provider === "noop") return new NoopBackend();
-  // A real provider would be dynamically imported here. For now the noop is
-  // the only built-in; consumers can register their own via `setBackend`.
-  return new NoopBackend();
+export function track(name: EventName, properties?: Record<string, string | number | boolean>) {
+  if (isTestEnv) return;
+
+  const event: TipEvent = {
+    name,
+    properties,
+    timestamp: Date.now(),
+  };
+
+  eventQueue.push(event);
+  // Process asynchronously
+  setTimeout(processQueue, 0);
 }
 
-class AnalyticsClient {
-  private backend: AnalyticsBackend;
+// Convenience methods for each funnel step
+export const analytics = {
+  tipPageViewed: (creatorHandle: string, referrer: "direct" | "social" | "embed") =>
+    track("tip_page_viewed", { creator_handle: creatorHandle, referrer }),
 
-  constructor() {
-    this.backend = resolveBackend();
-  }
+  amountSelected: (type: "quick" | "custom") =>
+    track("amount_selected", { type }),
 
-  setBackend(backend: AnalyticsBackend): void {
-    this.backend = backend;
-  }
+  cardEntryStarted: () =>
+    track("card_entry_started"),
 
-  track(event: AnalyticsEvent, properties?: AnalyticsProperties): void {
-    this.backend.track(event, properties);
-  }
-}
+  cardEntryCompleted: () =>
+    track("card_entry_completed"),
 
-export const analytics = new AnalyticsClient();
+  tipSubmitted: () =>
+    track("tip_submitted"),
+
+  tipSucceeded: () =>
+    track("tip_succeeded"),
+
+  tipFailed: (errorType: "card_declined" | "api_error" | "settlement_delayed") =>
+    track("tip_failed", { error_type: errorType }),
+};
+
+export default analytics;

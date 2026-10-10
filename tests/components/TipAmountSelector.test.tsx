@@ -1,8 +1,8 @@
 // TipAmountSelector.test.tsx
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TipAmountSelector } from "@/components/TipAmountSelector";
 import { tokens } from "@/styles/tokens";
-import { vi } from "vitest";
 
 describe("TipAmountSelector", () => {
   const minCents = 100;

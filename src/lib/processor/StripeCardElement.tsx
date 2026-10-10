@@ -1,3 +1,5 @@
+"use client";
+
 // Hosted card-entry wrapper around the payment processor's React SDK.
 //
 // Featherpay's own code NEVER receives, renders, or logs a raw card number

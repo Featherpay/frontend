@@ -51,6 +51,17 @@ export const typography = {
       "Arial",
       "sans-serif",
     ].join(", "),
+    // Monospace for code snippets, wallet addresses, etc.
+    mono: [
+      "ui-monospace",
+      "SFMono-Regular",
+      "Menlo",
+      "Monaco",
+      "Consolas",
+      "Liberation Mono",
+      "Courier New",
+      "monospace",
+    ].join(", "),
   },
   fontSize: {
     xs: "0.75rem", // 12px

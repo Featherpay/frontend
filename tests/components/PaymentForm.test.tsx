@@ -1,8 +1,8 @@
 // PaymentForm.test.tsx
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { PaymentForm } from "@/components/PaymentForm";
 import { tokens } from "@/styles/tokens";
-import { vi } from "vitest";
 
 describe("PaymentForm", () => {
   const mockOnSubmit = vi.fn();
@@ -113,7 +113,7 @@ describe("PaymentForm", () => {
 
     expect(
       screen.getByText((content, element) => {
-        const text = element.textContent || "";
+        const text = element?.textContent || "";
         return text === "Your $5 tip is on its way to Alex";
       })
     ).toBeInTheDocument();

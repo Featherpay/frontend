@@ -1,3 +1,5 @@
+"use client";
+
 // TipPageClient.tsx
 // Interactive client-side component for the tip flow.
 

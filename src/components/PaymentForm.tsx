@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { tokens } from "@/styles/tokens";
 import { StripeCardElement } from "@/lib/processor/StripeCardElement";

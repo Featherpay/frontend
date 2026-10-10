@@ -1,4 +1,5 @@
-// TipAmountSelector.tsx
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { tokens } from "@/styles/tokens";
 

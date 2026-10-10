@@ -9,13 +9,13 @@ import { notFound } from "next/navigation";
 import { apiClient } from "@/lib/api";
 import { TipAmountSelector } from "@/components/TipAmountSelector";
 import { PaymentForm } from "@/components/PaymentForm";
-import { TipPageClient } from "@/components/TipPageClient";
+import TipPageClient from "@/components/TipPageClient";
 import { tokens } from "@/styles/tokens";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: Promise<{ creatorHandle: string }>;
+  params: { creatorHandle: string };
 }
 
 async function CreatorProfile({
@@ -106,7 +106,7 @@ function LoadingState() {
 export default function CreatorHandlePage({ params }: PageProps) {
   return (
     <Suspense fallback={<LoadingState />}>
-      <CreatorProfile params={params} />
+      <CreatorProfile creatorHandle={params.creatorHandle} />
     </Suspense>
   );
 }
